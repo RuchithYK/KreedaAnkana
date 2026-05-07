@@ -33,6 +33,9 @@ class BookingViewModel : ViewModel() {
         private set
     var endTime by mutableStateOf("")
         private set
+    // which booking is being edited
+    var editingBooking by mutableStateOf<Booking?>(null)
+        private set
 
     fun onTeamNameChange(v: String) { teamName = v }
     fun onSportChange(v: String) { sport = v }
@@ -40,6 +43,57 @@ class BookingViewModel : ViewModel() {
     fun onStartTimeChange(v: String) { startTime = v }
     fun onEndTimeChange(v: String) { endTime = v }
 
+    fun startEditing(booking: Booking) {
+        editingBooking = booking
+        teamName = booking.teamName
+        sport = booking.sport
+        date = booking.date
+        startTime = booking.startTime
+        endTime = booking.endTime
+    }
+    fun cancelEditing() {
+        editingBooking = null
+        clearInputs()
+    }
+
+    fun saveBooking(userId: String) {
+        if (teamName.isBlank() || date.isBlank()) return
+        viewModelScope.launch {
+            if (editingBooking != null) {
+                // UPDATE existing booking
+                repository.updateBooking(
+                    editingBooking!!.copy(
+                        teamName = teamName,
+                        sport = sport,
+                        date = date,
+                        startTime = startTime,
+                        endTime = endTime
+                    )
+                )
+                editingBooking = null
+            } else {
+                // CREATE new booking
+                repository.addBooking(
+                    Booking(
+                        userId = userId,
+                        teamName = teamName,
+                        sport = sport,
+                        date = date,
+                        startTime = startTime,
+                        endTime = endTime
+                    )
+                )
+            }
+            clearInputs()
+        }
+    }
+
+    private fun clearInputs() {
+        teamName = ""
+        date = ""
+        startTime = ""
+        endTime = ""
+    }
     fun addBooking(userId: String) {
         if (teamName.isBlank() || date.isBlank()) return
         viewModelScope.launch {
