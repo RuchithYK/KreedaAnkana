@@ -9,32 +9,40 @@ import com.example.kreedaankana.data.UserProfile
 import com.example.kreedaankana.repository.FirebaseRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class ProfileViewModel : ViewModel() {
 
     private val repository = FirebaseRepository()
     private val firebaseAuth = FirebaseAuth.getInstance()
-    private val currentUser = firebaseAuth.currentUser
+    private val currentUser get() = firebaseAuth.currentUser
+    val userId get() = currentUser?.uid ?: ""
+    val displayName get() = currentUser?.displayName ?: ""
+    val email get() = currentUser?.email ?: ""
+    val photoUrl get() = currentUser?.photoUrl?.toString() ?: ""
 
-    val userId = currentUser?.uid ?: ""
-    val displayName = currentUser?.displayName ?: ""
-    val email = currentUser?.email ?: ""
-    val photoUrl = currentUser?.photoUrl?.toString() ?: ""
-
-    val userProfile = if (userId.isNotEmpty()) {
-        repository.getUserProfile(userId).stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = null
-        )
-    } else {
-        MutableStateFlow<UserProfile?>(null)
-    }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val userProfile = callbackFlow {
+        val listener = FirebaseAuth.AuthStateListener { auth ->
+            trySend(auth.currentUser)
+        }
+        firebaseAuth.addAuthStateListener(listener)
+        awaitClose { firebaseAuth.removeAuthStateListener(listener) }
+    }.flatMapLatest { user ->
+        if (user != null) {
+            repository.getUserProfile(user.uid)
+        } else {
+            flowOf(null)
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = null
+    )
 
     var teamNameInput by mutableStateOf("")
         private set

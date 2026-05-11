@@ -12,7 +12,20 @@
           "package_name": "com.example.kreedaankana"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "341337941748-0soch61icug88hha7l5vfl4mbuiophp5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kreedaankana",
+            "certificate_hash": "b177211958d6811beb8183471d66475b2c9330db"
+          }
+        },
+        {
+          "client_id": "341337941748-7pvd9am8nn4eathgs1tl3ah2cb1qtv26.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDEYGysEALIE6WzpBj2fOCAahJ2aeE3hnE"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "341337941748-7pvd9am8nn4eathgs1tl3ah2cb1qtv26.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

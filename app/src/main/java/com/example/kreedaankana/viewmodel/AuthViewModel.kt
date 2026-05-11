@@ -18,19 +18,27 @@ class AuthViewModel : ViewModel() {
     private val repository = FirebaseRepository()
     private val firebaseAuth = FirebaseAuth.getInstance()
 
-    private val _isLoggedIn = MutableStateFlow(
-        repository.getCurrentUser()?.uid?.isNotEmpty() == true
-    )
+    private val _isLoggedIn = MutableStateFlow(firebaseAuth.currentUser != null)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
 
-    private val _userName = MutableStateFlow(
-        repository.getCurrentUser()?.displayName ?: ""
-    )
+    init {
+        firebaseAuth.addAuthStateListener { auth ->
+            val user = auth.currentUser
+            _isLoggedIn.value = user != null
+            if (user != null) {
+                _userName.value = user.displayName ?: user.email ?: ""
+                _userEmail.value = user.email ?: ""
+            } else {
+                _userName.value = ""
+                _userEmail.value = ""
+            }
+        }
+    }
+
+    private val _userName = MutableStateFlow(firebaseAuth.currentUser?.displayName ?: "")
     val userName: StateFlow<String> = _userName
 
-    private val _userEmail = MutableStateFlow(
-        repository.getCurrentUser()?.email ?: ""
-    )
+    private val _userEmail = MutableStateFlow(firebaseAuth.currentUser?.email ?: "")
     val userEmail: StateFlow<String> = _userEmail
 
     val userId get() = repository.getCurrentUser()?.uid ?: ""

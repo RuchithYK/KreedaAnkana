@@ -8,15 +8,30 @@ import androidx.lifecycle.viewModelScope
 import com.example.kreedaankana.data.Booking
 import com.example.kreedaankana.repository.FirebaseRepository
 import com.example.kreedaankana.ui.theme.components.timesOverlap
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
 class BookingViewModel : ViewModel() {
 
     private val repository = FirebaseRepository()
+    private val firebaseAuth = FirebaseAuth.getInstance()
 
-    val bookings = repository.getBookings().stateIn(
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val authState = callbackFlow<com.google.firebase.auth.FirebaseUser?> {
+        val listener = FirebaseAuth.AuthStateListener { auth ->
+            trySend(auth.currentUser)
+        }
+        firebaseAuth.addAuthStateListener(listener)
+        awaitClose { firebaseAuth.removeAuthStateListener(listener) }
+    }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val bookings = authState.flatMapLatest { user ->
+        if (user != null) repository.getBookings() else flowOf(emptyList())
+    }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly, // loads immediately so conflict check works
         initialValue = emptyList()

@@ -3,6 +3,7 @@ package com.example.kreedaankana.ui.theme.screens
 import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -213,12 +214,20 @@ fun LoginScreen(
                 ),
                 enabled = !isLoading
             ) {
-                Text(
-                    text = "G   CONTINUE WITH GOOGLE",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
-                )
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = SportWhite,
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = "G   CONTINUE WITH GOOGLE",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -376,6 +385,33 @@ fun LoginScreen(
             }
 
             Spacer(modifier = Modifier.height(32.dp))
+        }
+
+        // ── GLOBAL LOADING OVERLAY ──
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.4f))
+                    .clickable(enabled = false) {},
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator(
+                        color = SportOrange,
+                        strokeWidth = 4.dp,
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "SYNCING WITH ARENA...",
+                        color = SportWhite,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 2.sp
+                    )
+                }
+            }
         }
     }
 }

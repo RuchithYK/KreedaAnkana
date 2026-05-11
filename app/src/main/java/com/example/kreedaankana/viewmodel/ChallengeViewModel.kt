@@ -7,15 +7,30 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kreedaankana.data.Challenge
 import com.example.kreedaankana.repository.FirebaseRepository
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
 class ChallengeViewModel : ViewModel() {
 
     private val repository = FirebaseRepository()
+    private val firebaseAuth = FirebaseAuth.getInstance()
 
-    val challenges = repository.getChallenges().stateIn(
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val authState = callbackFlow<com.google.firebase.auth.FirebaseUser?> {
+        val listener = FirebaseAuth.AuthStateListener { auth ->
+            trySend(auth.currentUser)
+        }
+        firebaseAuth.addAuthStateListener(listener)
+        awaitClose { firebaseAuth.removeAuthStateListener(listener) }
+    }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val challenges = authState.flatMapLatest { user ->
+        if (user != null) repository.getChallenges() else flowOf(emptyList())
+    }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
         initialValue = emptyList()

@@ -60,17 +60,24 @@ fun MainApp() {
 
     // Collect userProfile from ProfileViewModel
     val userProfile by profileViewModel.userProfile.collectAsState()
-    val currentUser = FirebaseAuth.getInstance().currentUser
-
-    val isLoggedIn = currentUser != null
+    val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
 
     LaunchedEffect(isLoggedIn) {
-        if (!isLoggedIn) {
-            navController.navigate("login") {
-                popUpTo(0)
+        if (isLoggedIn) {
+            // Success! Navigate to Home if we are currently on the login screen
+            if (navController.currentDestination?.route == "login") {
+                navController.navigate("home") {
+                    popUpTo("login") { inclusive = true }
+                }
             }
-        } else {
             profileViewModel.createProfileIfNotExists()
+        } else {
+            // Not logged in, ensure we are on the login screen
+            if (navController.currentDestination?.route != "login") {
+                navController.navigate("login") {
+                    popUpTo(0)
+                }
+            }
         }
     }
 
@@ -89,7 +96,7 @@ fun MainApp() {
                 composable("login") {
                     LoginScreen(
                         authViewModel = authViewModel,
-                        webClientId = "945199684941-o7d2o4543h8eie08a7cl2jsc42q39pbe.apps.googleusercontent.com"
+                        webClientId = "341337941748-7pvd9am8nn4eathgs1tl3ah2cb1qtv26.apps.googleusercontent.com"
                     )
                 }
                 composable("home") {

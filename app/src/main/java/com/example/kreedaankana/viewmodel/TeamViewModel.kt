@@ -9,34 +9,43 @@ import com.example.kreedaankana.data.Team
 import com.example.kreedaankana.data.TeamMember
 import com.example.kreedaankana.repository.FirebaseRepository
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.text.SimpleDateFormat
 import java.util.*
 
 class TeamViewModel : ViewModel() {
 
     private val repository = FirebaseRepository()
-    private val currentUser = FirebaseAuth.getInstance().currentUser
+    private val firebaseAuth = FirebaseAuth.getInstance()
+    private val currentUser get() = firebaseAuth.currentUser
+    val userId get() = currentUser?.uid ?: ""
+    val displayName get() = currentUser?.displayName ?: ""
 
-    val userId = currentUser?.uid ?: ""
-    val displayName = currentUser?.displayName ?: ""
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val authState = callbackFlow<com.google.firebase.auth.FirebaseUser?> {
+        val listener = FirebaseAuth.AuthStateListener { auth ->
+            trySend(auth.currentUser)
+        }
+        firebaseAuth.addAuthStateListener(listener)
+        awaitClose { firebaseAuth.removeAuthStateListener(listener) }
+    }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
-    val allTeams = repository.getAllTeams().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = emptyList()
-    )
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val allTeams = authState.flatMapLatest { user ->
+        if (user != null) repository.getAllTeams() else flowOf(emptyList())
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val teamScores = authState.flatMapLatest { user ->
+        if (user != null) repository.getTeamScores(user.displayName ?: "") 
+        else flowOf(emptyList())
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     private val _currentTeam = MutableStateFlow<Team?>(null)
     val currentTeam: StateFlow<Team?> = _currentTeam
-
-    val teamScores = repository.getTeamScores(displayName).stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = emptyList()
-    )
 
     var teamNameInput by mutableStateOf("")
         private set
@@ -58,7 +67,7 @@ class TeamViewModel : ViewModel() {
     fun hideLeaveConfirmation() { showLeaveDialog = false }
     fun clearError() { errorMessage = "" }
 
-    private var teamListenerJob: Job? = null
+    private var teamListenerJob: kotlinx.coroutines.Job? = null
     private var lastLoadedTeamId: String = ""
 
     fun loadTeam(teamId: String) {
