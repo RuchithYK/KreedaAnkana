@@ -7,7 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kreedaankana.data.Score
 import com.example.kreedaankana.repository.FirebaseRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -17,22 +20,23 @@ class ScoreViewModel : ViewModel() {
 
     val scores = repository.getScores().stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.Eagerly,
         initialValue = emptyList()
     )
 
-    // filter — "ALL", "Cricket", "Volleyball"
-    var selectedFilter by mutableStateOf("ALL")
-        private set
+    // ✅ FIX: use a real MutableStateFlow so combine() reacts to filter changes
+    private val _selectedFilter = MutableStateFlow("ALL")
+    val selectedFilter: StateFlow<String> = _selectedFilter
 
-    // filtered scores based on selected tab
-    val filteredScores get() = if (selectedFilter == "ALL") {
-        scores.value
-    } else {
-        scores.value.filter { it.sport == selectedFilter }
+    // ✅ FIX: filteredScores now truly reacts to both scores & filter changes
+    val filteredScores: StateFlow<List<Score>> = combine(scores, _selectedFilter) { allScores, filter ->
+        if (filter == "ALL") allScores
+        else allScores.filter { it.sport == filter }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    fun onFilterChange(filter: String) {
+        _selectedFilter.value = filter
     }
-
-    fun onFilterChange(filter: String) { selectedFilter = filter }
 
     // form inputs
     var team1 by mutableStateOf("")
@@ -48,8 +52,10 @@ class ScoreViewModel : ViewModel() {
     var date by mutableStateOf("")
         private set
 
-    // which score is being edited
     var editingScore by mutableStateOf<Score?>(null)
+        private set
+
+    var isLoading by mutableStateOf(false)
         private set
 
     fun onTeam1Change(v: String) { team1 = v }
@@ -74,37 +80,41 @@ class ScoreViewModel : ViewModel() {
         clearInputs()
     }
 
-    fun saveScore(userId: String) {
+    fun saveScore(userId: String, onComplete: () -> Unit = {}) {
         if (team1.isBlank() || team2.isBlank()) return
+        isLoading = true
         viewModelScope.launch {
-            if (editingScore != null) {
-                // UPDATE existing score
-                repository.updateScore(
-                    editingScore!!.copy(
-                        team1 = team1,
-                        team2 = team2,
-                        score1 = score1.toIntOrNull() ?: 0,
-                        score2 = score2.toIntOrNull() ?: 0,
-                        sport = sport,
-                        date = date
+            try {
+                if (editingScore != null) {
+                    repository.updateScore(
+                        editingScore!!.copy(
+                            team1 = team1,
+                            team2 = team2,
+                            score1 = score1.toIntOrNull() ?: 0,
+                            score2 = score2.toIntOrNull() ?: 0,
+                            sport = sport,
+                            date = date
+                        )
                     )
-                )
-                editingScore = null
-            } else {
-                // CREATE new score
-                repository.addScore(
-                    Score(
-                        userId = userId,
-                        team1 = team1,
-                        team2 = team2,
-                        score1 = score1.toIntOrNull() ?: 0,
-                        score2 = score2.toIntOrNull() ?: 0,
-                        sport = sport,
-                        date = date
+                    editingScore = null
+                } else {
+                    repository.addScore(
+                        Score(
+                            userId = userId,
+                            team1 = team1,
+                            team2 = team2,
+                            score1 = score1.toIntOrNull() ?: 0,
+                            score2 = score2.toIntOrNull() ?: 0,
+                            sport = sport,
+                            date = date
+                        )
                     )
-                )
+                }
+                clearInputs()
+                onComplete()
+            } finally {
+                isLoading = false
             }
-            clearInputs()
         }
     }
 
@@ -118,5 +128,6 @@ class ScoreViewModel : ViewModel() {
         score1 = ""
         score2 = ""
         date = ""
+        sport = "Cricket"  // ✅ reset sport too
     }
 }

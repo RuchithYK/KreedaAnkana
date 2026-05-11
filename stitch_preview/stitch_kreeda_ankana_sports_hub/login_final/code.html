@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kreeda-Ankana - Login</title>
+<!-- Google Fonts: Lexend -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;800;900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "inverse-primary": "#5d5f5f",
+                            "surface-container-highest": "#353535",
+                            "on-primary-fixed-variant": "#454747",
+                            "on-primary-container": "#636565",
+                            "surface-container-high": "#2a2a2a",
+                            "surface-variant": "#353535",
+                            "secondary-fixed": "#e3e2e2",
+                            "surface": "#131313",
+                            "on-primary-fixed": "#1a1c1c",
+                            "tertiary-container": "#e5e2e1",
+                            "primary-fixed": "#e2e2e2",
+                            "background": "#131313",
+                            "secondary-container": "#484949",
+                            "tertiary-fixed": "#e5e2e1",
+                            "tertiary-fixed-dim": "#c8c6c5",
+                            "on-primary": "#2f3131",
+                            "error": "#ffb4ab",
+                            "on-secondary": "#2f3131",
+                            "secondary-fixed-dim": "#c7c6c6",
+                            "secondary": "#c7c6c6",
+                            "on-surface": "#e2e2e2",
+                            "on-secondary-fixed-variant": "#464747",
+                            "on-tertiary-fixed": "#1c1b1b",
+                            "inverse-on-surface": "#303030",
+                            "primary-container": "#e2e2e2",
+                            "on-secondary-fixed": "#1a1c1c",
+                            "on-error-container": "#ffdad6",
+                            "on-error": "#690005",
+                            "outline": "#8e9192",
+                            "on-tertiary": "#313030",
+                            "surface-tint": "#c6c6c7",
+                            "primary-fixed-dim": "#c6c6c7",
+                            "on-tertiary-container": "#656464",
+                            "on-background": "#e2e2e2",
+                            "outline-variant": "#444748",
+                            "surface-container-lowest": "#0e0e0e",
+                            "error-container": "#93000a",
+                            "surface-container": "#1f1f1f",
+                            "primary": "#ffffff",
+                            "on-tertiary-fixed-variant": "#474746",
+                            "surface-dim": "#131313",
+                            "surface-container-low": "#1b1b1b",
+                            "on-surface-variant": "#c4c7c8",
+                            "on-secondary-container": "#b8b8b8",
+                            "surface-bright": "#393939",
+                            "tertiary": "#ffffff",
+                            "inverse-surface": "#e2e2e2"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "unit": "4px",
+                            "sm": "8px",
+                            "margin": "32px",
+                            "lg": "24px",
+                            "md": "16px",
+                            "gutter": "20px",
+                            "xs": "4px",
+                            "xl": "40px"
+                    },
+                    "fontFamily": {
+                            "headline-lg": ["Lexend"],
+                            "body-md": ["Lexend"],
+                            "label-sm": ["Lexend"],
+                            "label-bold": ["Lexend"],
+                            "headline-md": ["Lexend"],
+                            "display-xl": ["Lexend"],
+                            "body-lg": ["Lexend"]
+                    },
+                    "fontSize": {
+                            "headline-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                            "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                            "label-sm": ["12px", { "lineHeight": "1.0", "fontWeight": "500" }],
+                            "label-bold": ["14px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                            "headline-md": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                            "display-xl": ["80px", { "lineHeight": "1.0", "letterSpacing": "-0.04em", "fontWeight": "900" }],
+                            "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-black text-primary font-body-md antialiased min-h-screen selection:bg-white selection:text-black">
+<main class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+<!-- Left Panel: Cinematic Branding (Hidden on mobile) -->
+<div class="hidden lg:flex relative flex-col justify-end p-xl bg-cover bg-center overflow-hidden" data-alt="A gritty, high-contrast monochrome photograph of an elite athlete in mid-motion, captured in a stark, dimly lit training arena. The scene is heavily shadowed with piercing white spotlights creating dramatic edge lighting along the athlete's profile. The aesthetic is aggressive, minimalist, and cinematic, emphasizing raw power, intense focus, and elite performance within a pure black and white dark mode environment." style="background-image: url('https://lh3.googleusercontent.com/aida/ADBb0uggIdg38ayCtJykrDs2m0yussasM4AlhnddW0kgYDics6uRmUu92SbVoLD_dN64OMkXF0Vk3-C6bZeTVDGy1Jkag4v_ASYUn5bUUCSi9WHVfWpo3pQlYV8MGjx18xlc1my5SZFfV5adDzSjG0fS7boF0el4YHsV0r1I0ISjANtU8N2IiLqg-c8cNJbcqfALRh3POWetWOfumVmKzrc9YomUpjAeo0eHGYXA_xYOlKGJoBKg54k9uZOTNmle6SBViEdJAAflRZThww');">
+<!-- Tonal Stacking & Refraction Overlay -->
+<div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-0"></div>
+<div class="absolute inset-0 bg-black/10 backdrop-blur-[2px] z-0"></div>
+<div class="relative z-10 max-w-2xl">
+<h1 class="font-display-xl text-display-xl text-primary uppercase italic tracking-tighter drop-shadow-lg">
+                    Kreeda<br/>-Ankana
+                </h1>
+<div class="h-px w-24 bg-primary mt-lg mb-md"></div>
+<p class="font-body-lg text-body-lg text-primary/70 uppercase tracking-widest max-w-md">
+                    Global telemetry and operational control for elite athletic performance.
+                </p>
+</div>
+</div>
+<!-- Right Panel: Authentication Canvas -->
+<div class="flex flex-col justify-center px-lg py-xl md:px-margin lg:px-24 xl:px-32 relative bg-surface-container-lowest border-l border-white/5">
+<!-- Mobile Branding -->
+<div class="lg:hidden mb-xl">
+<h1 class="font-headline-lg text-headline-lg text-primary uppercase italic tracking-tighter">
+                    Kreeda<br/>-Ankana
+                </h1>
+<div class="h-px w-16 bg-primary mt-sm"></div>
+</div>
+<div class="w-full max-w-md mx-auto flex flex-col gap-xl">
+<!-- Graphic Element (Image 8) -->
+<div class="w-16 h-16 grayscale opacity-90 mix-blend-screen border border-white/20 p-unit" data-alt="A stark, high-contrast black and white abstract graphic representing speed and advanced telemetry. Sharp, rigid geometric lines intersect over a pitch-black background, glowing with brilliant white intensity at the edges. The image suggests a highly technical, engineered, and aggressive high-performance interface component strictly adhering to a monochromatic dark mode palette." style="background-image: url('https://lh3.googleusercontent.com/aida/ADBb0uj3ziCS4BcxtmLpwzMP_h00ouOxxN8o-VDwjIVwLBJ2nz7ghVBArDgNGi_-buP_zz1G4jdzXmdcqm8evULjyytlkv7i5j2UoduRROr4RpjkqJ48quNC96zLUXrrwYTaW40c3x3enASqoGUuuvr3rdDk-f2zcHmLQ3DiAJSg4Y_VMGm9ugfa6aV-K-81_dYAzh_-T9x7u17lcPxl8jX4oJqKhjBdwIIF_drgtA5Z95UQyfzjQGxOmyXC9cYvXMxdQrqQmLbfQtnA'); background-size: cover; background-position: center;">
+</div>
+<!-- Header -->
+<div class="flex flex-col gap-xs">
+<h2 class="font-headline-md text-headline-md text-primary uppercase tracking-tight">Access Protocol</h2>
+<p class="font-body-md text-body-md text-primary/50">Identify yourself to enter the operational grid.</p>
+</div>
+<!-- Primary Focus: Google Auth -->
+<button class="group w-full flex items-center justify-center gap-md bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-black transition-all duration-300 rounded-none px-lg py-md" type="button">
+<svg class="w-5 h-5 text-current group-hover:text-black transition-colors" fill="currentColor" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"></path>
+</svg>
+<span class="font-label-bold text-label-bold uppercase">Continue with Google</span>
+</button>
+<!-- Divider -->
+<div class="flex items-center gap-md w-full">
+<div class="h-px bg-white/10 flex-1"></div>
+<span class="font-label-sm text-label-sm text-primary/40 uppercase tracking-widest">Or Manual Override</span>
+<div class="h-px bg-white/10 flex-1"></div>
+</div>
+<!-- Form -->
+<form class="flex flex-col gap-lg">
+<!-- Input Group -->
+<div class="flex flex-col gap-sm group">
+<label class="font-label-bold text-label-bold text-primary/60 uppercase group-focus-within:text-primary transition-colors">Operator ID</label>
+<input class="w-full bg-surface-container-lowest border-0 border-b border-primary/20 text-primary font-body-lg text-body-lg px-0 py-sm focus:ring-0 focus:border-primary focus:bg-white/5 transition-all outline-none rounded-none placeholder-primary/20" placeholder="ENTER CLEARANCE EMAIL" type="email"/>
+</div>
+<!-- Input Group -->
+<div class="flex flex-col gap-sm group mt-sm">
+<div class="flex justify-between items-center">
+<label class="font-label-bold text-label-bold text-primary/60 uppercase group-focus-within:text-primary transition-colors">Passcode</label>
+<a class="font-label-sm text-label-sm text-primary/40 hover:text-primary uppercase transition-colors border-b border-transparent hover:border-primary" href="#">Forgot Passcode</a>
+</div>
+<input class="w-full bg-surface-container-lowest border-0 border-b border-primary/20 text-primary font-body-lg text-body-lg px-0 py-sm focus:ring-0 focus:border-primary focus:bg-white/5 transition-all outline-none rounded-none placeholder-primary/20 tracking-[0.2em]" placeholder="••••••••" type="password"/>
+</div>
+<!-- Main Action -->
+<button class="mt-lg w-full bg-primary text-black hover:bg-surface-tint font-label-bold text-label-bold uppercase py-md px-lg transition-all duration-300 rounded-none flex items-center justify-center gap-sm group" type="button">
+                        ENTER THE ARENA
+                        <span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</form>
+<!-- Footer Links -->
+<div class="text-center mt-md pt-lg border-t border-white/5">
+<a class="font-label-bold text-label-bold text-primary/50 hover:text-primary uppercase transition-colors inline-flex items-center gap-xs group" href="#">
+                        New operator? Initiate Protocol
+                        <span class="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">chevron_right</span>
+</a>
+</div>
+</div>
+</div>
+</main>
+</body></html>

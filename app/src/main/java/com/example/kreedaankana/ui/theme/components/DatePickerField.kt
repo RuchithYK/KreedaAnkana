@@ -6,6 +6,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.kreedaankana.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -17,55 +22,75 @@ fun DatePickerField(
     onDateSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // controls whether calendar popup is showing
     var showPicker by remember { mutableStateOf(false) }
-
     val datePickerState = rememberDatePickerState()
 
-    // when user taps the field → show calendar
     OutlinedTextField(
         value = value,
         onValueChange = {},
-        readOnly = true,  // user cant type manually
-        label = { Text(label) },
+        readOnly = true,
+        label = if (label.isNotEmpty()) { { Text(label, color = SportGreyLight, fontSize = 12.sp, fontWeight = FontWeight.Bold) } } else null,
+        placeholder = { Text("Select Date", color = SportGreyMuted) },
         trailingIcon = {
             IconButton(onClick = { showPicker = true }) {
                 Icon(
                     Icons.Default.DateRange,
                     contentDescription = "Pick Date",
-                    tint = Color(0xFF81C784)
+                    tint = SportOrange
                 )
             }
         },
-        modifier = modifier
+        modifier = modifier,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = SportWhite,
+            unfocusedTextColor = SportWhite,
+            focusedBorderColor = SportOrange,
+            unfocusedBorderColor = SportBorderLight,
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent
+        ),
+        shape = RoundedCornerShape(8.dp)
     )
 
-    // calendar popup
     if (showPicker) {
         DatePickerDialog(
             onDismissRequest = { showPicker = false },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        // convert selected timestamp to readable date string
                         datePickerState.selectedDateMillis?.let { millis ->
-                            val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                             val dateStr = formatter.format(Date(millis))
                             onDateSelected(dateStr)
                         }
                         showPicker = false
                     }
                 ) {
-                    Text("OK", color = Color(0xFF81C784))
+                    Text("OK", color = SportOrange, fontWeight = FontWeight.Black)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showPicker = false }) {
-                    Text("Cancel", color = Color.Gray)
+                    Text("CANCEL", color = SportGreyLight)
                 }
-            }
+            },
+            colors = DatePickerDefaults.colors(
+                containerColor = SportSurface2
+            )
         ) {
-            DatePicker(state = datePickerState)
+            DatePicker(
+                state = datePickerState,
+                colors = DatePickerDefaults.colors(
+                    titleContentColor = SportWhite,
+                    headlineContentColor = SportWhite,
+                    weekdayContentColor = SportGreyLight,
+                    dayContentColor = SportWhite,
+                    selectedDayContainerColor = SportOrange,
+                    selectedDayContentColor = SportWhite,
+                    todayContentColor = SportOrange,
+                    todayDateBorderColor = SportOrange
+                )
+            )
         }
     }
 }

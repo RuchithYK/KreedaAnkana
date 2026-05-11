@@ -10,17 +10,16 @@ class HomeViewModel : ViewModel() {
 
     private val repository = FirebaseRepository()
 
-    // recent bookings for home screen
+    // Use Eagerly so stats are available immediately when screen opens
     val recentBookings = repository.getRecentBookings().stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.Eagerly,
         initialValue = emptyList()
     )
 
-    // recent challenges for home screen
     val recentChallenges = repository.getRecentChallenges().stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.Eagerly,
         initialValue = emptyList()
     )
 }

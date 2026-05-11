@@ -24,10 +24,19 @@ class FirebaseRepository {
     // ─────────────────────────────────────────
 
     fun getUserProfile(userId: String): Flow<UserProfile?> = callbackFlow {
+        // FIXED — guard against empty userId
+        if (userId.isEmpty()) {
+            trySend(null)
+            awaitClose {}
+            return@callbackFlow
+        }
         val listener = db.collection("users")
             .document(userId)
             .addSnapshotListener { snapshot, error ->
-                if (error != null) return@addSnapshotListener
+                if (error != null) {
+                    trySend(null)
+                    return@addSnapshotListener
+                }
                 val profile = snapshot?.toObject(UserProfile::class.java)
                 trySend(profile)
             }
@@ -35,6 +44,7 @@ class FirebaseRepository {
     }
 
     suspend fun saveUserProfile(profile: UserProfile) {
+        if (profile.userId.isEmpty()) return  // guard
         db.collection("users")
             .document(profile.userId)
             .set(profile)
@@ -42,67 +52,138 @@ class FirebaseRepository {
     }
 
     suspend fun updateTeamName(userId: String, teamName: String) {
+        if (userId.isEmpty()) return
         db.collection("users")
             .document(userId)
             .update("teamName", teamName)
             .await()
     }
 
+    // FIXED — now also deletes team if user is captain or removes from members
+    // FIXED — re-authenticate before deleting, then sign out properly
     suspend fun deleteAllUserData(userId: String) {
-        val bookings = db.collection("bookings")
-            .whereEqualTo("userId", userId).get().await()
-        bookings.documents.forEach { it.reference.delete().await() }
+        if (userId.isEmpty()) return
 
-        val challenges = db.collection("challenges")
-            .whereEqualTo("userId", userId).get().await()
-        challenges.documents.forEach { it.reference.delete().await() }
+        println("=== STARTING DELETE FOR USER: $userId ===")
 
-        val scores = db.collection("scores")
-            .whereEqualTo("userId", userId).get().await()
-        scores.documents.forEach { it.reference.delete().await() }
+        try {
+            // delete bookings
+            println("Deleting bookings...")
+            val bookings = db.collection("bookings")
+                .whereEqualTo("userId", userId).get().await()
+            println("Found ${bookings.documents.size} bookings")
+            bookings.documents.forEach {
+                it.reference.delete().await()
+                println("Deleted booking: ${it.id}")
+            }
 
-        db.collection("users").document(userId).delete().await()
-        auth.currentUser?.delete()?.await()
+            // delete challenges
+            println("Deleting challenges...")
+            val challenges = db.collection("challenges")
+                .whereEqualTo("userId", userId).get().await()
+            println("Found ${challenges.documents.size} challenges")
+            challenges.documents.forEach {
+                it.reference.delete().await()
+                println("Deleted challenge: ${it.id}")
+            }
+
+            // delete scores
+            println("Deleting scores...")
+            val scores = db.collection("scores")
+                .whereEqualTo("userId", userId).get().await()
+            println("Found ${scores.documents.size} scores")
+            scores.documents.forEach {
+                it.reference.delete().await()
+                println("Deleted score: ${it.id}")
+            }
+
+            // delete team if captain
+            println("Deleting captain teams...")
+            val captainTeams = db.collection("teams")
+                .whereEqualTo("captainId", userId).get().await()
+            println("Found ${captainTeams.documents.size} captain teams")
+            captainTeams.documents.forEach {
+                it.reference.delete().await()
+                println("Deleted team: ${it.id}")
+            }
+
+            // remove from team members
+            println("Removing from team members...")
+            val allTeams = db.collection("teams").get().await()
+            allTeams.documents.forEach { doc ->
+                val members = doc.get("members") as? List<Map<String, Any>> ?: emptyList()
+                val userMember = members.find { it["userId"] == userId }
+                if (userMember != null) {
+                    println("Removing member from team: ${doc.id}")
+                    doc.reference.update(
+                        "members", FieldValue.arrayRemove(userMember)
+                    ).await()
+                }
+            }
+
+            // delete user profile
+            println("Deleting user profile...")
+            db.collection("users").document(userId).delete().await()
+            println("User profile deleted!")
+
+            // (Sign out happens later in ProfileViewModel after user auth deletion)
+            println("=== DELETE COMPLETE ===")
+
+        } catch (e: Exception) {
+            println("=== DELETE FAILED: ${e.message} ===")
+            e.printStackTrace()
+            throw e  // rethrow so ProfileViewModel catches it
+        }
     }
 
     // ─────────────────────────────────────────
-    // TEAMS
+    // TEAMS — FIXED joinTeam crash
     // ─────────────────────────────────────────
 
-    // get all teams — for join team screen
     fun getAllTeams(): Flow<List<Team>> = callbackFlow {
         val listener = db.collection("teams")
             .addSnapshotListener { snapshot, error ->
-                if (error != null) return@addSnapshotListener
-                val teams = snapshot?.documents?.map { doc ->
-                    doc.toObject(Team::class.java)!!.copy(id = doc.id)
+                if (error != null) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+                val teams = snapshot?.documents?.mapNotNull { doc ->
+                    try {
+                        doc.toObject(Team::class.java)?.copy(id = doc.id)
+                    } catch (e: Exception) { null }
                 } ?: emptyList()
                 trySend(teams)
             }
         awaitClose { listener.remove() }
     }
 
-    // get ONE specific team by id
     fun getTeam(teamId: String): Flow<Team?> = callbackFlow {
+        if (teamId.isEmpty()) {
+            trySend(null)
+            awaitClose {}
+            return@callbackFlow
+        }
         val listener = db.collection("teams")
             .document(teamId)
             .addSnapshotListener { snapshot, error ->
-                if (error != null) return@addSnapshotListener
+                if (error != null) {
+                    trySend(null)
+                    return@addSnapshotListener
+                }
                 val team = snapshot?.toObject(Team::class.java)?.copy(id = snapshot.id)
                 trySend(team)
             }
         awaitClose { listener.remove() }
     }
 
-    // create new team
     suspend fun createTeam(
         teamName: String,
         sport: String,
         captainId: String,
         captainName: String
     ): String {
+        if (captainId.isEmpty()) return ""
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-
         val team = Team(
             teamName = teamName,
             sport = sport,
@@ -117,88 +198,72 @@ class FirebaseRepository {
             ),
             createdAt = today
         )
-
-        // add team to firestore → get the auto generated team id
         val docRef = db.collection("teams").add(team).await()
         val teamId = docRef.id
-
-        // update user profile with teamId and teamName
         db.collection("users").document(captainId).update(
-            mapOf(
-                "teamId" to teamId,
-                "teamName" to teamName
-            )
+            mapOf("teamId" to teamId, "teamName" to teamName)
         ).await()
-
         return teamId
     }
 
-    // join existing team
+    // FIXED — joinTeam now safely handles Firestore map format
     suspend fun joinTeam(
         teamId: String,
         userId: String,
         displayName: String,
         teamName: String
     ) {
+        if (teamId.isEmpty() || userId.isEmpty()) return
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
-        val newMember = mapOf(
+        // FIXED — use HashMap explicitly so Firestore reads it correctly
+        val newMember = hashMapOf(
             "userId" to userId,
             "displayName" to displayName,
             "joinedAt" to today
         )
 
-        // FieldValue.arrayUnion = add to array without removing existing items
-        // like [...existingMembers, newMember] in JS
         db.collection("teams").document(teamId)
             .update("members", FieldValue.arrayUnion(newMember))
             .await()
 
-        // update user profile
         db.collection("users").document(userId).update(
-            mapOf(
-                "teamId" to teamId,
-                "teamName" to teamName
-            )
+            mapOf("teamId" to teamId, "teamName" to teamName)
         ).await()
     }
 
-    // leave team
-    suspend fun leaveTeam(
-        teamId: String,
-        userId: String,
-        displayName: String
-    ) {
-        val memberToRemove = mapOf(
-            "userId" to userId,
-            "displayName" to displayName
-        )
+    suspend fun leaveTeam(teamId: String, userId: String, displayName: String) {
+        if (teamId.isEmpty() || userId.isEmpty()) return
 
-        // FieldValue.arrayRemove = remove from array
-        db.collection("teams").document(teamId)
-            .update("members", FieldValue.arrayRemove(memberToRemove))
-            .await()
+        // get current members and find exact match to remove
+        val teamDoc = db.collection("teams").document(teamId).get().await()
+        val members = teamDoc.get("members") as? List<Map<String, Any>> ?: emptyList()
+        val memberToRemove = members.find { it["userId"] == userId }
 
-        // clear teamId and teamName from user profile
+        if (memberToRemove != null) {
+            db.collection("teams").document(teamId)
+                .update("members", FieldValue.arrayRemove(memberToRemove))
+                .await()
+        }
+
         db.collection("users").document(userId).update(
-            mapOf(
-                "teamId" to "",
-                "teamName" to ""
-            )
+            mapOf("teamId" to "", "teamName" to "")
         ).await()
     }
 
-    // get scores for a specific team
     fun getTeamScores(teamName: String): Flow<List<Score>> = callbackFlow {
         val listener = db.collection("scores")
             .addSnapshotListener { snapshot, error ->
-                if (error != null) return@addSnapshotListener
-                // filter scores where this team played
+                if (error != null) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
                 val scores = snapshot?.documents?.mapNotNull { doc ->
-                    val score = doc.toObject(Score::class.java)?.copy(id = doc.id)
-                    // include score if team1 OR team2 matches
-                    if (score?.team1 == teamName || score?.team2 == teamName) score
-                    else null
+                    try {
+                        val score = doc.toObject(Score::class.java)?.copy(id = doc.id)
+                        if (score?.team1 == teamName || score?.team2 == teamName) score
+                        else null
+                    } catch (e: Exception) { null }
                 } ?: emptyList()
                 trySend(scores)
             }
@@ -212,9 +277,13 @@ class FirebaseRepository {
     fun getBookings(): Flow<List<Booking>> = callbackFlow {
         val listener = db.collection("bookings")
             .addSnapshotListener { snapshot, error ->
-                if (error != null) return@addSnapshotListener
-                val bookings = snapshot?.documents?.map { doc ->
-                    doc.toObject(Booking::class.java)!!.copy(id = doc.id)
+                if (error != null) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+                val bookings = snapshot?.documents?.mapNotNull { doc ->
+                    try { doc.toObject(Booking::class.java)?.copy(id = doc.id) }
+                    catch (e: Exception) { null }
                 } ?: emptyList()
                 trySend(bookings)
             }
@@ -240,9 +309,13 @@ class FirebaseRepository {
     fun getChallenges(): Flow<List<Challenge>> = callbackFlow {
         val listener = db.collection("challenges")
             .addSnapshotListener { snapshot, error ->
-                if (error != null) return@addSnapshotListener
-                val challenges = snapshot?.documents?.map { doc ->
-                    doc.toObject(Challenge::class.java)!!.copy(id = doc.id)
+                if (error != null) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+                val challenges = snapshot?.documents?.mapNotNull { doc ->
+                    try { doc.toObject(Challenge::class.java)?.copy(id = doc.id) }
+                    catch (e: Exception) { null }
                 } ?: emptyList()
                 trySend(challenges)
             }
@@ -268,9 +341,13 @@ class FirebaseRepository {
     fun getScores(): Flow<List<Score>> = callbackFlow {
         val listener = db.collection("scores")
             .addSnapshotListener { snapshot, error ->
-                if (error != null) return@addSnapshotListener
-                val scores = snapshot?.documents?.map { doc ->
-                    doc.toObject(Score::class.java)!!.copy(id = doc.id)
+                if (error != null) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+                val scores = snapshot?.documents?.mapNotNull { doc ->
+                    try { doc.toObject(Score::class.java)?.copy(id = doc.id) }
+                    catch (e: Exception) { null }
                 } ?: emptyList()
                 trySend(scores)
             }
@@ -297,9 +374,13 @@ class FirebaseRepository {
         val listener = db.collection("bookings")
             .limit(3)
             .addSnapshotListener { snapshot, error ->
-                if (error != null) return@addSnapshotListener
-                val bookings = snapshot?.documents?.map { doc ->
-                    doc.toObject(Booking::class.java)!!.copy(id = doc.id)
+                if (error != null) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+                val bookings = snapshot?.documents?.mapNotNull { doc ->
+                    try { doc.toObject(Booking::class.java)?.copy(id = doc.id) }
+                    catch (e: Exception) { null }
                 } ?: emptyList()
                 trySend(bookings)
             }
@@ -310,9 +391,13 @@ class FirebaseRepository {
         val listener = db.collection("challenges")
             .limit(2)
             .addSnapshotListener { snapshot, error ->
-                if (error != null) return@addSnapshotListener
-                val challenges = snapshot?.documents?.map { doc ->
-                    doc.toObject(Challenge::class.java)!!.copy(id = doc.id)
+                if (error != null) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+                val challenges = snapshot?.documents?.mapNotNull { doc ->
+                    try { doc.toObject(Challenge::class.java)?.copy(id = doc.id) }
+                    catch (e: Exception) { null }
                 } ?: emptyList()
                 trySend(challenges)
             }

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kreeda-Ankana - Athlete Profile</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:ital,wght@0,400;0,500;0,700;0,800;0,900;1,400;1,700;1,800;1,900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#2f3131",
+                        "on-primary-fixed": "#1a1c1c",
+                        "secondary-fixed-dim": "#c7c6c6",
+                        "surface-tint": "#c6c6c7",
+                        "outline": "#8e9192",
+                        "on-tertiary": "#313030",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "tertiary-container": "#e5e2e1",
+                        "tertiary": "#ffffff",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "on-surface-variant": "#c4c7c8",
+                        "surface-variant": "#353535",
+                        "surface-container-high": "#2a2a2a",
+                        "outline-variant": "#444748",
+                        "inverse-surface": "#e2e2e2",
+                        "secondary-container": "#484949",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-primary-container": "#636565",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "on-error": "#690005",
+                        "on-tertiary-container": "#656464",
+                        "surface-container-highest": "#353535",
+                        "on-tertiary-fixed-variant": "#474746",
+                        "on-secondary": "#2f3131",
+                        "surface-bright": "#393939",
+                        "on-error-container": "#ffdad6",
+                        "secondary": "#c7c6c6",
+                        "on-background": "#e2e2e2",
+                        "secondary-fixed": "#e3e2e2",
+                        "primary-fixed": "#e2e2e2",
+                        "on-secondary-container": "#b8b8b8",
+                        "tertiary-fixed": "#e5e2e1",
+                        "error": "#ffb4ab",
+                        "surface": "#131313",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#1b1b1b",
+                        "surface-container": "#1f1f1f",
+                        "on-primary-fixed-variant": "#454747",
+                        "inverse-primary": "#5d5f5f",
+                        "surface-dim": "#131313",
+                        "on-secondary-fixed-variant": "#464747",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "primary": "#ffffff",
+                        "on-surface": "#e2e2e2",
+                        "inverse-on-surface": "#303030",
+                        "primary-container": "#e2e2e2",
+                        "background": "#131313"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin": "32px",
+                        "xs": "4px",
+                        "xl": "40px",
+                        "unit": "4px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "gutter": "20px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Lexend"],
+                        "body-md": ["Lexend"],
+                        "label-bold": ["Lexend"],
+                        "headline-lg": ["Lexend"],
+                        "display-xl": ["Lexend"],
+                        "body-lg": ["Lexend"],
+                        "headline-md": ["Lexend"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "1.0", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-bold": ["14px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "display-xl": ["80px", { "lineHeight": "1.0", "letterSpacing": "-0.04em", "fontWeight": "900" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .metallic-text {
+            background: linear-gradient(180deg, #FFFFFF 0%, #A0A0A0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+        .silver-gradient {
+            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+        }
+    </style>
+</head>
+<body class="bg-background text-primary font-body-md min-h-screen flex flex-col antialiased selection:bg-white selection:text-black pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-black border-b border-white/10 no-shadows flex justify-between items-center px-6 h-16">
+<button class="text-white hover:bg-white/10 transition-colors p-2 rounded-none flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">bolt</span>
+</button>
+<h1 class="font-['Lexend'] font-black italic uppercase tracking-tighter text-xl text-white">KREEDA-ANKANA</h1>
+<button class="text-white hover:bg-white/10 transition-colors p-2 rounded-none flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">avatar_add</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-24 px-6 md:px-margin max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-xl">
+<!-- Profile Header Section (Left Column on Desktop) -->
+<section class="md:col-span-4 flex flex-col items-center text-center space-y-lg">
+<!-- Avatar Frame -->
+<div class="relative group">
+<div class="absolute inset-0 rounded-full bg-white blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+<div class="w-48 h-48 rounded-full border border-white/20 p-2 glass-panel relative z-10 overflow-hidden">
+<img alt="Profile Avatar" class="w-full h-full object-cover rounded-full grayscale hover:grayscale-0 transition-all duration-500" data-alt="A striking portrait photo of an elite athlete, focusing intensely on the camera. The athlete is illuminated by sharp, high-contrast studio lighting against a pure obsidian black background. The mood is powerful and determined, conveying raw performance and professional focus. Subtle cool white rim lighting highlights the contours of the face, fitting a premium, high-tech sports aesthetic." src="https://lh3.googleusercontent.com/aida/ADBb0uj3ziCS4BcxtmLpwzMP_h00ouOxxN8o-VDwjIVwLBJ2nz7ghVBArDgNGi_-buP_zz1G4jdzXmdcqm8evULjyytlkv7i5j2UoduRROr4RpjkqJ48quNC96zLUXrrwYTaW40c3x3enASqoGUuuvr3rdDk-f2zcHmLQ3DiAJSg4Y_VMGm9ugfa6aV-K-81_dYAzh_-T9x7u17lcPxl8jX4oJqKhjBdwIIF_drgtA5Z95UQyfzjQGxOmyXC9cYvXMxdQrqQmLbfQtnA"/>
+</div>
+</div>
+<!-- User Info -->
+<div class="space-y-sm">
+<h2 class="font-headline-md italic text-white">Marcus Vanguard</h2>
+<p class="font-body-md text-on-surface-variant flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+                    marcus.vanguard@gmail.com
+                </p>
+</div>
+<!-- Manage Account Action -->
+<button class="w-full glass-panel py-3 px-6 text-white font-label-bold italic hover:bg-white/10 transition-all flex items-center justify-center gap-2 border border-white/20 hover:border-white">
+<span class="material-symbols-outlined text-[18px]">manage_accounts</span>
+                Manage Google Account
+            </button><button class="w-full glass-panel py-3 px-6 text-white font-label-bold italic hover:bg-error/10 transition-all flex items-center justify-center gap-2 border border-white/20 hover:border-error group mt-4">
+<span class="material-symbols-outlined text-[18px] group-hover:text-error transition-colors">logout</span>
+<span class="group-hover:text-error transition-colors">Logout</span>
+</button>
+</section>
+<!-- Stats and Team Identity (Right Column on Desktop) -->
+<section class="md:col-span-8 flex flex-col gap-xl">
+<!-- Team Identity Bento -->
+<div class="glass-panel p-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-md relative overflow-hidden">
+<!-- Decorative background element -->
+<div class="absolute -right-20 -top-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+<div class="relative z-10 space-y-xs">
+<span class="font-label-sm text-outline tracking-widest uppercase">Team Identity</span>
+<h3 class="font-headline-lg italic metallic-text uppercase">Team Alpha</h3>
+</div>
+<button class="relative z-10 px-6 py-2 border-2 border-white text-white font-label-bold uppercase italic hover:bg-white hover:text-black transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">swap_horiz</span>
+                    Change Team
+                </button>
+</div>
+<!-- Pro-Tier Stats Grid -->
+<!-- Progress/Level Section -->
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 bg-black h-20 z-50 border-t border-white/10 shadow-[0_-4px_20px_rgba(255,255,255,0.05)] md:hidden">
+<button class="flex flex-col items-center justify-center text-white/40 p-2 hover:text-white/80 w-[64px]">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">home</span>
+<span class="font-['Lexend'] font-bold italic text-[10px] uppercase tracking-wider">HOME</span>
+</button>
+<button class="flex flex-col items-center justify-center text-white/40 p-2 hover:text-white/80 w-[64px]">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">calendar_today</span>
+<span class="font-['Lexend'] font-bold italic text-[10px] uppercase tracking-wider">CALENDAR</span>
+</button>
+<!-- Assuming this is a profile page, it might map best to 'TEAM' or just be considered a generic view. In standard systems, we highlight the closest context. Here we leave 'TEAM' inactive as 'Profile' isn't explicitly in the nav, but if we assume 'TEAM' is the closest community context... wait, let's keep them all inactive or select HOME if needed. Given rules: pick the closest match. No direct match. So standard is inactive. -->
+<button class="flex flex-col items-center justify-center text-white/40 p-2 hover:text-white/80 w-[64px]">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">leaderboard</span>
+<span class="font-['Lexend'] font-bold italic text-[10px] uppercase tracking-wider">BOARD</span>
+</button>
+<button class="flex flex-col items-center justify-center text-white/40 p-2 hover:text-white/80 w-[64px]">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">sports_score</span>
+<span class="font-['Lexend'] font-bold italic text-[10px] uppercase tracking-wider">SCORES</span>
+</button>
+<!-- Since this is a Profile looking at Team Identity, TEAM is the closest match -->
+<button class="flex flex-col items-center justify-center bg-white text-black p-2 min-w-[64px] scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">groups</span>
+<span class="font-['Lexend'] font-bold italic text-[10px] uppercase tracking-wider">TEAM</span>
+</button>
+</nav>
+</body></html>

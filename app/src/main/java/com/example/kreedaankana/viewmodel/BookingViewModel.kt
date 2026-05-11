@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kreedaankana.data.Booking
 import com.example.kreedaankana.repository.FirebaseRepository
+import com.example.kreedaankana.ui.theme.components.timesOverlap
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -15,14 +16,12 @@ class BookingViewModel : ViewModel() {
 
     private val repository = FirebaseRepository()
 
-    // live list of all bookings
     val bookings = repository.getBookings().stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.Eagerly, // loads immediately so conflict check works
         initialValue = emptyList()
     )
 
-    // input state lives in ViewModel
     var teamName by mutableStateOf("")
         private set
     var sport by mutableStateOf("Cricket")
@@ -33,8 +32,13 @@ class BookingViewModel : ViewModel() {
         private set
     var endTime by mutableStateOf("")
         private set
-    // which booking is being edited
     var editingBooking by mutableStateOf<Booking?>(null)
+        private set
+    var conflictError by mutableStateOf("")
+        private set
+    var isSaving by mutableStateOf(false)
+        private set
+    var saveSuccess by mutableStateOf(false)
         private set
 
     fun onTeamNameChange(v: String) { teamName = v }
@@ -42,6 +46,8 @@ class BookingViewModel : ViewModel() {
     fun onDateChange(v: String) { date = v }
     fun onStartTimeChange(v: String) { startTime = v }
     fun onEndTimeChange(v: String) { endTime = v }
+    fun clearConflictError() { conflictError = "" }
+    fun clearSaveSuccess() { saveSuccess = false }
 
     fun startEditing(booking: Booking) {
         editingBooking = booking
@@ -51,40 +57,82 @@ class BookingViewModel : ViewModel() {
         startTime = booking.startTime
         endTime = booking.endTime
     }
+
     fun cancelEditing() {
         editingBooking = null
         clearInputs()
     }
 
-    fun saveBooking(userId: String) {
-        if (teamName.isBlank() || date.isBlank()) return
+    fun saveBooking(userId: String, onComplete: (Boolean) -> Unit) {
+        if (teamName.isBlank() || date.isBlank() ||
+            startTime.isBlank() || endTime.isBlank()
+        ) {
+            conflictError = "Please fill all fields!"
+            onComplete(false)
+            return
+        }
+
+        val currentBookings = bookings.value
+
+        val conflict = currentBookings.find { existing ->
+            if (editingBooking != null && existing.id == editingBooking!!.id) return@find false
+            if (existing.date != date) return@find false
+            timesOverlap(
+                newStart = startTime,
+                newEnd = endTime,
+                existingStart = existing.startTime,
+                existingEnd = existing.endTime
+            )
+        }
+
+        if (conflict != null) {
+            conflictError = "Slot already booked by \"${conflict.teamName}\" " +
+                    "(${conflict.startTime} – ${conflict.endTime}). Choose a different time."
+            onComplete(false)
+            return
+        }
+
+        isSaving = true
         viewModelScope.launch {
-            if (editingBooking != null) {
-                // UPDATE existing booking
-                repository.updateBooking(
-                    editingBooking!!.copy(
-                        teamName = teamName,
-                        sport = sport,
-                        date = date,
-                        startTime = startTime,
-                        endTime = endTime
+            try {
+                if (editingBooking != null) {
+                    repository.updateBooking(
+                        editingBooking!!.copy(
+                            teamName = teamName,
+                            sport = sport,
+                            date = date,
+                            startTime = startTime,
+                            endTime = endTime
+                        )
                     )
-                )
-                editingBooking = null
-            } else {
-                // CREATE new booking
-                repository.addBooking(
-                    Booking(
-                        userId = userId,
-                        teamName = teamName,
-                        sport = sport,
-                        date = date,
-                        startTime = startTime,
-                        endTime = endTime
+                    editingBooking = null
+                } else {
+                    repository.addBooking(
+                        Booking(
+                            userId = userId,
+                            teamName = teamName,
+                            sport = sport,
+                            date = date,
+                            startTime = startTime,
+                            endTime = endTime
+                        )
                     )
-                )
+                }
+                clearInputs()
+                saveSuccess = true
+                onComplete(true)
+            } catch (e: Exception) {
+                conflictError = "Failed to save: ${e.message}"
+                onComplete(false)
+            } finally {
+                isSaving = false
             }
-            clearInputs()
+        }
+    }
+
+    fun deleteBooking(bookingId: String) {
+        viewModelScope.launch {
+            repository.deleteBooking(bookingId)
         }
     }
 
@@ -93,31 +141,7 @@ class BookingViewModel : ViewModel() {
         date = ""
         startTime = ""
         endTime = ""
-    }
-    fun addBooking(userId: String) {
-        if (teamName.isBlank() || date.isBlank()) return
-        viewModelScope.launch {
-            repository.addBooking(
-                Booking(
-                    userId = userId,
-                    teamName = teamName,
-                    sport = sport,
-                    date = date,
-                    startTime = startTime,
-                    endTime = endTime
-                )
-            )
-            // clear inputs after saving
-            teamName = ""
-            date = ""
-            startTime = ""
-            endTime = ""
-        }
-    }
-
-    fun deleteBooking(bookingId: String) {
-        viewModelScope.launch {
-            repository.deleteBooking(bookingId)
-        }
+        sport = "Cricket"   // ✅ reset sport
+        conflictError = ""
     }
 }

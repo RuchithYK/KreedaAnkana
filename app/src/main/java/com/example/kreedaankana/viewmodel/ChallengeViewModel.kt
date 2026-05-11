@@ -17,7 +17,7 @@ class ChallengeViewModel : ViewModel() {
 
     val challenges = repository.getChallenges().stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.Eagerly,
         initialValue = emptyList()
     )
 
@@ -39,6 +39,15 @@ class ChallengeViewModel : ViewModel() {
     var editingChallenge by mutableStateOf<Challenge?>(null)
         private set
 
+    // filter state
+    var selectedFilter by mutableStateOf("ALL")
+        private set
+
+    // loading state
+    var isLoading by mutableStateOf(false)
+        private set
+
+    fun onFilterChange(filter: String) { selectedFilter = filter }
     fun onTeamNameChange(v: String) { teamName = v }
     fun onSportChange(v: String) { sport = v }
     fun onMessageChange(v: String) { message = v }
@@ -55,53 +64,49 @@ class ChallengeViewModel : ViewModel() {
 
     fun cancelEditing() {
         editingChallenge = null
-        teamName = ""
-        sport = "Cricket"
-        message = ""
-        date = ""
+        clearInputs()
     }
 
-    fun addChallenge(userId: String) {
+    fun addChallenge(userId: String, onComplete: () -> Unit = {}) {
         if (teamName.isBlank() || message.isBlank()) return
+        isLoading = true
         viewModelScope.launch {
-            if (editingChallenge != null) {
-                // UPDATE existing challenge
-                repository.updateChallenge(
-                    editingChallenge!!.copy(
-                        teamName = teamName,
-                        sport = sport,
-                        message = message,
-                        date = date
+            try {
+                if (editingChallenge != null) {
+                    repository.updateChallenge(
+                        editingChallenge!!.copy(
+                            teamName = teamName,
+                            sport = sport,
+                            message = message,
+                            date = date
+                        )
                     )
-                )
-                editingChallenge = null
-            } else {
-                // CREATE new challenge
-                repository.addChallenge(
-                    Challenge(
-                        userId = userId,
-                        teamName = teamName,
-                        sport = sport,
-                        message = message,
-                        date = date,
-                        status = "OPEN"
+                    editingChallenge = null
+                } else {
+                    repository.addChallenge(
+                        Challenge(
+                            userId = userId,
+                            teamName = teamName,
+                            sport = sport,
+                            message = message,
+                            date = date,
+                            status = "OPEN"
+                        )
                     )
-                )
+                }
+                clearInputs()
+                onComplete()
+            } finally {
+                isLoading = false
             }
-            // clear inputs
-            teamName = ""
-            message = ""
-            date = ""
         }
     }
 
-    // first team to accept wins — status changes to ACCEPTED
     fun acceptChallenge(
         challenge: Challenge,
         acceptingTeamName: String,
         acceptingUserId: String
     ) {
-        // only accept if still OPEN
         if (challenge.status != "OPEN") return
         viewModelScope.launch {
             repository.updateChallenge(
@@ -114,13 +119,10 @@ class ChallengeViewModel : ViewModel() {
         }
     }
 
-    // only accepted team can reply
     fun replyToChallenge(challenge: Challenge) {
         if (replyInput.isBlank()) return
         viewModelScope.launch {
-            repository.updateChallenge(
-                challenge.copy(reply = replyInput)
-            )
+            repository.updateChallenge(challenge.copy(reply = replyInput))
             replyInput = ""
         }
     }
@@ -129,5 +131,12 @@ class ChallengeViewModel : ViewModel() {
         viewModelScope.launch {
             repository.deleteChallenge(challengeId)
         }
+    }
+
+    private fun clearInputs() {
+        teamName = ""
+        sport = "Cricket"   // ✅ reset sport
+        message = ""
+        date = ""
     }
 }

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kreeda-Ankana - Challenge Board</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;800;900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#1f1f1f",
+                        "error-container": "#93000a",
+                        "surface-container-lowest": "#0e0e0e",
+                        "outline-variant": "#444748",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "on-tertiary-container": "#656464",
+                        "on-background": "#e2e2e2",
+                        "surface-tint": "#c6c6c7",
+                        "outline": "#8e9192",
+                        "on-tertiary": "#313030",
+                        "on-error": "#690005",
+                        "on-error-container": "#ffdad6",
+                        "tertiary": "#ffffff",
+                        "inverse-surface": "#e2e2e2",
+                        "surface-bright": "#393939",
+                        "on-secondary-container": "#b8b8b8",
+                        "on-surface-variant": "#c4c7c8",
+                        "surface-dim": "#131313",
+                        "surface-container-low": "#1b1b1b",
+                        "on-tertiary-fixed-variant": "#474746",
+                        "primary": "#ffffff",
+                        "secondary-container": "#484949",
+                        "background": "#131313",
+                        "tertiary-container": "#e5e2e1",
+                        "primary-fixed": "#e2e2e2",
+                        "surface": "#131313",
+                        "on-primary-fixed": "#1a1c1c",
+                        "surface-variant": "#353535",
+                        "secondary-fixed": "#e3e2e2",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-highest": "#353535",
+                        "on-primary-fixed-variant": "#454747",
+                        "on-primary-container": "#636565",
+                        "inverse-primary": "#5d5f5f",
+                        "primary-container": "#e2e2e2",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "inverse-on-surface": "#303030",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "secondary": "#c7c6c6",
+                        "on-surface": "#e2e2e2",
+                        "on-secondary-fixed-variant": "#464747",
+                        "secondary-fixed-dim": "#c7c6c6",
+                        "on-secondary": "#2f3131",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "on-primary": "#2f3131",
+                        "tertiary-fixed": "#e5e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "md": "16px",
+                        "gutter": "20px",
+                        "xl": "40px",
+                        "unit": "4px",
+                        "sm": "8px",
+                        "margin": "32px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Lexend"],
+                        "display-xl": ["Lexend"],
+                        "label-sm": ["Lexend"],
+                        "label-bold": ["Lexend"],
+                        "headline-md": ["Lexend"],
+                        "headline-lg": ["Lexend"],
+                        "body-md": ["Lexend"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "display-xl": ["80px", {"lineHeight": "1.0", "letterSpacing": "-0.04em", "fontWeight": "900"}],
+                        "label-sm": ["12px", {"lineHeight": "1.0", "fontWeight": "500"}],
+                        "label-bold": ["14px", {"lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-md": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "headline-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* Glassmorphism level 2 util */
+        .glass-panel {
+            background-color: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen selection:bg-primary selection:text-black">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 dark:bg-black/90 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-6 py-4">
+<div class="flex items-center justify-center">
+<span class="material-symbols-outlined dark:text-white" style="font-variation-settings: 'FILL' 1;">sports_score</span>
+</div>
+<div class="text-2xl font-black italic tracking-tighter text-white uppercase font-lexend">
+            KREEDA-ANKANA
+        </div>
+<div class="w-8 h-8 rounded-none border border-white/20 overflow-hidden flex-shrink-0">
+<img alt="Elite Athlete Profile" class="w-full h-full object-cover filter grayscale contrast-125" data-alt="A striking high-contrast, black and white portrait of a determined elite athlete. The subject's face is half-shadowed in deep obsidian black, with stark, crisp white rim lighting emphasizing sharp jawline features. The mood is intense, focused, and embodies a premium, aggressive athletic aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4oWfDYgcVDcnLH70AXblKqOLKoGk2QRtnFU2n2-2jpVjmMWx7bSnkhfN1aPEEGYcl2HWKEOEUusrhJTCdWveJmVm4fBID7Nwl4lGqCXv9iZnEoNBtMBTjtmcmYauWdCqjFCbxqEblZ3Fdrm6QBMj1_7xnJts5sc4EaN89MM7m5O1zbl4Dv1jubqRlR9nrfI9BNaetU0EKGBIn2HxRZ_vzQL2j2EbcZlhr89Um82YlWuFdGkfCs7dyjMVRsib8UixXfSKWhZcpB3Q"/>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="pt-[90px] pb-[120px] px-6 max-w-[1200px] mx-auto">
+<!-- Header Section -->
+<div class="flex justify-between items-end mb-xl border-b border-white/10 pb-sm">
+<h1 class="font-headline-lg text-headline-lg text-primary uppercase italic">Active Board</h1>
+<div class="font-label-sm text-label-sm text-on-surface-variant tracking-widest uppercase pb-1">
+                24 Challenges
+            </div>
+</div>
+<!-- Filter Chips (Static Representation) -->
+<div class="flex gap-sm mb-xl overflow-x-auto pb-2 scrollbar-hide">
+<button class="bg-primary text-black font-label-bold text-label-bold px-md py-sm rounded-none uppercase">All Active</button>
+<button class="bg-surface-container border border-white/20 text-on-surface font-label-bold text-label-bold px-md py-sm rounded-none uppercase hover:bg-white/10 transition-colors">Basketball</button>
+<button class="bg-surface-container border border-white/20 text-on-surface font-label-bold text-label-bold px-md py-sm rounded-none uppercase hover:bg-white/10 transition-colors">Soccer</button>
+<button class="bg-surface-container border border-white/20 text-on-surface font-label-bold text-label-bold px-md py-sm rounded-none uppercase hover:bg-white/10 transition-colors">Tennis</button>
+</div>
+<!-- Challenge Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Card 1: OPEN -->
+<article class="glass-panel p-lg rounded-none relative group cursor-pointer overflow-hidden flex flex-col justify-between min-h-[220px]">
+<!-- Interactive Glow Element -->
+<div class="absolute -inset-1 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-x-[-100%] group-hover:translate-x-[100%]"></div>
+<div class="relative z-10 flex flex-col h-full">
+<div class="flex justify-between items-start mb-md">
+<span class="bg-surface-container border border-white/20 text-white font-label-sm text-label-sm px-2 py-1 rounded-none uppercase tracking-widest">
+                            Basketball
+                        </span>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-none bg-[#22c55e] shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+<span class="text-[#22c55e] font-label-bold text-label-bold uppercase tracking-widest">OPEN</span>
+</div>
+</div>
+<div class="flex-grow">
+<h2 class="font-headline-md text-headline-md text-primary uppercase italic mb-xs group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-outline transition-all">
+                            Iron Wolves
+                        </h2>
+<div class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                            Downtown Court Alpha
+                        </div>
+</div>
+<div class="flex justify-between items-end mt-md pt-sm border-t border-white/10">
+<div class="flex items-center gap-sm font-label-bold text-label-bold text-white">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                            OCT 28 | 19:00 EST
+                        </div>
+<span class="material-symbols-outlined text-white/30 group-hover:text-white transition-colors">expand_more</span>
+</div>
+</div>
+</article>
+<!-- Card 2: ACCEPTED -->
+<article class="glass-panel p-lg rounded-none relative group cursor-pointer overflow-hidden flex flex-col justify-between min-h-[220px]">
+<div class="absolute -inset-1 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-x-[-100%] group-hover:translate-x-[100%]"></div>
+<div class="relative z-10 flex flex-col h-full">
+<div class="flex justify-between items-start mb-md">
+<span class="bg-surface-container border border-white/20 text-white font-label-sm text-label-sm px-2 py-1 rounded-none uppercase tracking-widest">
+                            Soccer
+                        </span>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-none bg-[#3b82f6] shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span>
+<span class="text-[#3b82f6] font-label-bold text-label-bold uppercase tracking-widest">ACCEPTED</span>
+</div>
+</div>
+<div class="flex-grow">
+<h2 class="font-headline-md text-headline-md text-primary uppercase italic mb-xs group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-outline transition-all">
+                            Neon FC vs Titans
+                        </h2>
+<div class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                            Metro Stadium Pitch 2
+                        </div>
+</div>
+<div class="flex justify-between items-end mt-md pt-sm border-t border-white/10">
+<div class="flex items-center gap-sm font-label-bold text-label-bold text-white">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                            OCT 29 | 20:30 EST
+                        </div>
+<span class="material-symbols-outlined text-white/30 group-hover:text-white transition-colors">expand_more</span>
+</div>
+</div>
+</article>
+<!-- Card 3: OPEN -->
+<article class="glass-panel p-lg rounded-none relative group cursor-pointer overflow-hidden flex flex-col justify-between min-h-[220px]">
+<div class="absolute -inset-1 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-x-[-100%] group-hover:translate-x-[100%]"></div>
+<div class="relative z-10 flex flex-col h-full">
+<div class="flex justify-between items-start mb-md">
+<span class="bg-surface-container border border-white/20 text-white font-label-sm text-label-sm px-2 py-1 rounded-none uppercase tracking-widest">
+                            Tennis
+                        </span>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-none bg-[#22c55e] shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+<span class="text-[#22c55e] font-label-bold text-label-bold uppercase tracking-widest">OPEN</span>
+</div>
+</div>
+<div class="flex-grow">
+<h2 class="font-headline-md text-headline-md text-primary uppercase italic mb-xs group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-outline transition-all">
+                            Singles Draft
+                        </h2>
+<div class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">person</span>
+                            Searching for +1 (Rating: Elite)
+                        </div>
+</div>
+<div class="flex justify-between items-end mt-md pt-sm border-t border-white/10">
+<div class="flex items-center gap-sm font-label-bold text-label-bold text-white">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                            OCT 30 | 08:00 EST
+                        </div>
+<span class="material-symbols-outlined text-white/30 group-hover:text-white transition-colors">expand_more</span>
+</div>
+</div>
+</article>
+<!-- Card 4: ACCEPTED -->
+<article class="glass-panel p-lg rounded-none relative group cursor-pointer overflow-hidden flex flex-col justify-between min-h-[220px]">
+<div class="absolute -inset-1 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-x-[-100%] group-hover:translate-x-[100%]"></div>
+<div class="relative z-10 flex flex-col h-full">
+<div class="flex justify-between items-start mb-md">
+<span class="bg-surface-container border border-white/20 text-white font-label-sm text-label-sm px-2 py-1 rounded-none uppercase tracking-widest">
+                            Basketball
+                        </span>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-none bg-[#3b82f6] shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span>
+<span class="text-[#3b82f6] font-label-bold text-label-bold uppercase tracking-widest">ACCEPTED</span>
+</div>
+</div>
+<div class="flex-grow">
+<h2 class="font-headline-md text-headline-md text-primary uppercase italic mb-xs group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-outline transition-all">
+                            Apex Squad vs Vertex
+                        </h2>
+<div class="flex items-center gap-xs font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                            Southside Rec Center
+                        </div>
+</div>
+<div class="flex justify-between items-end mt-md pt-sm border-t border-white/10">
+<div class="flex items-center gap-sm font-label-bold text-label-bold text-white">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                            NOV 02 | 18:00 EST
+                        </div>
+<span class="material-symbols-outlined text-white/30 group-hover:text-white transition-colors">expand_more</span>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- Floating Action Button (FAB) -->
+<button aria-label="Post new challenge" class="fixed bottom-[100px] right-6 md:right-[calc(50%-580px)] w-14 h-14 bg-[#f97316] text-white rounded-none flex items-center justify-center shadow-[0_0_20px_rgba(249,115,22,0.4)] hover:bg-[#fdba74] hover:scale-105 transition-all z-40">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-safe h-20 z-50 md:hidden dark:bg-black/90 backdrop-blur-2xl border-t border-white/10">
+<div class="flex flex-col items-center justify-center dark:text-white/50 p-2 group cursor-pointer hover:dark:text-white">
+<span class="material-symbols-outlined mb-1 group-active:scale-90 transition-transform">home</span>
+<span class="font-lexend font-bold text-[10px] uppercase tracking-widest">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center dark:text-white/50 p-2 group cursor-pointer hover:dark:text-white">
+<span class="material-symbols-outlined mb-1 group-active:scale-90 transition-transform">calendar_today</span>
+<span class="font-lexend font-bold text-[10px] uppercase tracking-widest">Calendar</span>
+</div>
+<!-- Active Tab: Board -->
+<div class="flex flex-col items-center justify-center dark:bg-white dark:text-black p-2 scale-100 transition-all cursor-default">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-lexend font-bold text-[10px] uppercase tracking-widest">Board</span>
+</div>
+<div class="flex flex-col items-center justify-center dark:text-white/50 p-2 group cursor-pointer hover:dark:text-white">
+<span class="material-symbols-outlined mb-1 group-active:scale-90 transition-transform">military_tech</span>
+<span class="font-lexend font-bold text-[10px] uppercase tracking-widest">Scores</span>
+</div>
+<div class="flex flex-col items-center justify-center dark:text-white/50 p-2 group cursor-pointer hover:dark:text-white">
+<span class="material-symbols-outlined mb-1 group-active:scale-90 transition-transform">groups</span>
+<span class="font-lexend font-bold text-[10px] uppercase tracking-widest">Team</span>
+</div>
+</nav>
+</body></html>

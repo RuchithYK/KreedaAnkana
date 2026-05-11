@@ -1,55 +1,53 @@
 package com.example.kreedaankana.ui.theme
 
 import android.app.Activity
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-private val DarkColorScheme = darkColorScheme(
-    primary = KhelWhite,       // Main text and prominent icons
-    onPrimary = KhelBlack,
-    secondary = KhelGold,      // Accents like the winner border
-    background = KhelBlack,    // Main app background
-    surface = SurfaceGrey,     // Card backgrounds (like the Calendar slots)
-    onBackground = KhelWhite,
-    onSurface = KhelWhite
-)
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
-private val LightColorScheme = lightColorScheme(
-    primary = KhelBlack,
-    onPrimary = KhelWhite,
-    secondary = KhelGold,
-    background = KhelWhite,
-    surface = LightGrey,
-    onBackground = KhelBlack,
-    onSurface = KhelBlack
+// Kreeda Ankana — Neon Sports dark theme
+private val NeonSportsColorScheme = darkColorScheme(
+    primary              = SportOrange,
+    onPrimary            = SportWhite,
+    primaryContainer     = SportSurface2,
+    onPrimaryContainer   = SportOrangeLight,
+    secondary            = SportGreen,
+    onSecondary          = SportBlack,
+    secondaryContainer   = SportSurface,
+    onSecondaryContainer = SportGreen,
+    background           = SportBlack,
+    onBackground         = SportWhite,
+    surface              = SportSurface,
+    onSurface            = SportWhite,
+    surfaceVariant       = SportSurface2,
+    onSurfaceVariant     = SportGreyLight,
+    outline              = SportBorderLight,
+    error                = SportRed,
+    onError              = SportWhite,
+    errorContainer       = SportRedBg,
+    onErrorContainer     = SportRed
 )
 
 @Composable
 fun KreedaAnkanaTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = SportBlack.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
     }
 
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
+        colorScheme = NeonSportsColorScheme,
+        typography  = Typography,
+        content     = content
     )
 }
