@@ -220,6 +220,16 @@ ViewModels receive their Repository via constructor — no Hilt or Dagger used, 
 
 ---
 
+---
+
+## 📸 Screenshots
+
+| Home | Calendar | Challenge Board | Score Wall |
+|:---:|:---:|:---:|:---:|
+| <img src="https://github.com/user-attachments/assets/51a4c92c-6257-47e0-974e-bc0daa338cea" width="200" /> | <img src="https://github.com/user-attachments/assets/8de4a3ea-9c82-404c-a5f9-aef195cc3fda" width="200" /> | <img src="https://github.com/user-attachments/assets/284f073b-7831-486c-981d-01fb821c5111" width="200" /> | <img src="https://github.com/user-attachments/assets/9c9991ec-3978-4d44-bcf7-7d29e12937eb" width="200" /> |
+
+---
+
 ## 🤝 Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
